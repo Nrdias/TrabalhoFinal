@@ -2,7 +2,6 @@ public class Pontuacao {
     private final String nome;
     private int pontos, jogos, vitorias, empates, derrotas ,golsPros, golsContra, saldoGols, pontosPossiveis;
     private double aproveitamento;
-
     Pontuacao(String aux){
         nome = aux;
         pontos = 0;
@@ -16,92 +15,76 @@ public class Pontuacao {
         pontosPossiveis = 0;
         aproveitamento = 0.0;
     }
-
     public void setPontos() {
         this.pontos = vitorias*3 + empates;
     }
-
-    public void setJogos(int jogos) {
-        this.jogos = jogos;
+    public void setJogos() {
+        this.jogos++ ;
     }
-
-    public void setVitorias(int vitorias) {
-        this.vitorias = vitorias;
+    public void setVitorias() {
+        this.vitorias++;
     }
-
-    public void setEmpates(int empates) {
-        this.empates = empates;
+    public void setEmpates() {
+        this.empates++;
     }
-
-    public void setDerrotas(int derrotas) {
-        this.derrotas = derrotas;
+    public void setDerrotas() {
+        this.derrotas++;
     }
-
     public void setGolsPros(int golsPros) {
-        this.golsPros = golsPros;
+        this.golsPros += golsPros;
     }
-
     public void setGolsContra(int golsContra) {
-        this.golsContra = golsContra;
+        this.golsContra += golsContra;
     }
-
     public void setSaldoGols() {
+
+        if(golsPros - golsContra < 0){
+            this.saldoGols = 0; return;
+        }
         this.saldoGols = golsPros - golsContra;
-    }
 
+
+    }
     public void setPontosPossiveis() {
-        this.pontosPossiveis = vitorias*3;
+        this.pontosPossiveis = jogos*3;
     }
-
     public void setAproveitamento() {
         if (pontosPossiveis == 0) this.aproveitamento = 0;
-        else this.aproveitamento = pontos/pontosPossiveis*100;
+        else this.aproveitamento = (double)pontos/(double)pontosPossiveis*100;
     }
-
     public String getNome() {
         return nome;
     }
-
     public int getPontos() {
         return pontos;
     }
-
     public int getJogos() {
         return jogos;
     }
-
     public int getVitorias() {
         return vitorias;
     }
-
     public int getEmpates() {
         return empates;
     }
-
     public int getDerrotas() {
         return derrotas;
     }
-
     public int getGolsPros() {
         return golsPros;
     }
-
     public int getGolsContra() {
         return golsContra;
     }
-
     public int getSaldoGols() {
         return saldoGols;
     }
-
     public int getPontosPossiveis() {
         return pontosPossiveis;
     }
-
     public String getAproveitamento() {
         return aproveitamento + "%";
     }
-
     @Override
     public String toString() {
         return "Pontuação{" +

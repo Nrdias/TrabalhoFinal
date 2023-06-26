@@ -5,65 +5,64 @@ public class TabelaApp {
     public static void main(String[] args) {
 
         Scanner in = new Scanner(System.in);
-        System.out.println("Bem vindo! \n Qual o campeonato você deseja simular?");
-        String campeonato = in.next();
-        System.out.println("Perfeito, e quantos times irão jogar?");
-        int quantidade = in.nextInt();
-        ListaDeTimes listaTimes = new ListaDeTimes(campeonato, quantidade);
-
-        for(int i = 0; i < quantidade; i++){
-            System.out.print("Informe o nome do time a ser cadastrado no campeonato: ");
-            String aux = in.next();
-            listaTimes.adicionaTime(aux);
-        }
-        TabelaDePontuacao tabela = new TabelaDePontuacao(listaTimes);
-        System.out.print("Informe o número de rodadas: ");
-        int rodadas = in.nextInt();
-        ListaDePartidas partidas = new ListaDePartidas(listaTimes.getTimesCadastrados(), rodadas);
+        ListaDeTimes times = inicializarCampeonato();
+        TabelaDePontuacao tabela = new TabelaDePontuacao(times);
+        ListaDePartidas partidas = inicalizarRodadas(times);
 
         int choice = 0;
         do{
             System.out.println("""
-                    O que deseja fazer?
-                    
                     ###MENU###
-                    0 - Encerrar o programa
-                    1 - Consultar um time cadastrado
-                    2 - Consultar a lista de times cadastrados
-                    3 - Consultar a pontuação de um time
-                    4 - Consultar a tabela de pontuação
-                    5 - Cadastrar uma partida
-                    6 - Consultar a lista de partidas
                     
+                    0 - Encerrar o programa
+                    1 - Adicionar um time
+                    2 - Consultar se o time está cadastrado
+                    3 - Consultar a lista de times cadastrados
+                    4 - Consultar a pontuação de um time
+                    5 - Consultar a tabela de pontuação
+                    6 - Cadastrar uma partida
+                    7 - Consultar a lista de partidas
+                    8 - Consultar tabela de partidas
+                    9 - Encerra a tabela
                     """);
 
             choice = in.nextInt();
-            String time, timeA, timeB, date;
-            String r;
-            int golsA, golsB;
+            String time, timeA, timeB, date, r;
+            int id, golsA, golsB;
 
             switch (choice){
                 case 1:
+                    System.out.print("Informe o nome do time a ser cadastrado: ");
+                    time = in.next();
+                    if(times.consultaTime(time)){
+                        System.out.println("Time já cadastro!");
+                        break;
+                    }
+                    System.out.println(times.adicionaTime(time));
+                    System.out.println(tabela.adicionaTime(time));
+                    partidas.setMax(times);
+                    break;
+
+                case 2:
                     System.out.print("Informe o nome do time: ");
                     time = in.next();
-                    r = (listaTimes.consultaTime(time))? "Time cadastrado":"Time não cadastrado";
-                    System.out.println(r);
-                    break;
-                case 2:
-                    r = listaTimes.toString();
+                    r = (times.consultaTime(time))? "Time cadastrado" : "Time não cadastrado";
                     System.out.println(r);
                     break;
                 case 3:
+                    System.out.println(times.toString());
+                    break;
+                case 4:
                     System.out.print("Informe o nome do time: ");
                     time = in.next();
                     r = tabela.getPontos(time);
                     System.out.println(r);
                     break;
-                case 4:
-                    r = tabela.toString(listaTimes.getCampeonato());
+                case 5:
+                    r = tabela.toString(times.getCampeonato());
                     System.out.println(r);
                     break;
-                case 5:
+                case 6:
                     System.out.print("Informe a data da partida: ");
                     date = in.next();
                     System.out.print("Informe o time A: ");
@@ -74,57 +73,94 @@ public class TabelaApp {
                     golsA = in.nextInt();
                     System.out.print("Quantos Gols o time B fez? ");
                     golsB = in.nextInt();
-                    Partida jogo = new Partida(timeA, timeB, date, golsA, golsB);
+                    Partida jogo = new Partida(partidas.getPartidas(),timeA, timeB, date, golsA, golsB);
                     partidas.setPartida(jogo);
-                    calculaPartida(tabela, jogo);
+                    System.out.println(calculaPartida(partidas, tabela, jogo));
+                    if(partidas.getPartidas() == partidas.getMax()){
+                        System.out.println(tabela.toString(times.getCampeonato()));
+                        return;
+                    }
                     break;
-                case 6:
-                    System.out.print("Informe a data da partida: ");
-                    date = in.next();
-                    System.out.print("Informe o time A: ");
-                    timeA = in.next();
-                    System.out.print("Informe o time B: ");
-                    timeB = in.next();
-                    System.out.println(partidas.getPartida(timeA,timeB,date));
+                case 7:
+                    System.out.print("Informe o ID da partida: ");
+                    id = in.nextInt();
+                    r = partidas.getJogos(id);
+                    System.out.println(r);
+                    break;
+                case 8:
+                    partidas.ordenaPartidas();
+                    System.out.println(partidas.toString());
+                case 9:
+                    System.out.println("Encerrando o Campeonato...");
+                    System.out.println(tabela.toString(times.getCampeonato()));
+                    return;
             }
-
-        }while(choice != 0);
+            }while(choice != 0);
     }
-    public static void calculaPartida(TabelaDePontuacao tabela, Partida jogo){
+
+    public static ListaDeTimes inicializarCampeonato(){
+        Scanner in = new Scanner(System.in);
+
+        System.out.println("Bem vindo! \n Qual o campeonato você deseja simular?");
+        String campeonato = in.next();
+        System.out.println("Perfeito, e quantos times irão jogar?");
+        int quantidade = in.nextInt();
+        ListaDeTimes listaTimes = new ListaDeTimes(campeonato, quantidade);
+        for(int i = 0; i < 2; i++){
+            System.out.print("Informe o nome do time a ser cadastrado no campeonato: ");
+            String aux = in.next();
+            listaTimes.adicionaTime(aux);
+        }
+        return listaTimes;
+    }
+
+    public static ListaDePartidas inicalizarRodadas(ListaDeTimes t){
+        Scanner in = new Scanner(System.in);
+        System.out.print("Informe o número de rodadas: ");
+        int rodadas = in.nextInt();
+        ListaDePartidas partidas = new ListaDePartidas(rodadas);
+        return partidas;
+    }
+
+    public static String calculaPartida(ListaDePartidas partidas, TabelaDePontuacao tabela, Partida jogo){
+        if(partidas.getPartidas() == partidas.getMax()) return "Limite Atingido!";
         String casa = jogo.getTimeA();
         String visitante = jogo.getTimeB();
         Pontuacao timeCasa = tabela.getTime(casa);
         Pontuacao timeVisitante = tabela.getTime(visitante);
 
         if((jogo.getGolsA()) > (jogo.getGolsB())) {
-            timeCasa.setVitorias(1);
-            timeVisitante.setDerrotas(1);
+            timeCasa.setVitorias();
+            timeVisitante.setDerrotas();
         };
         if((jogo.getGolsA()) < (jogo.getGolsB())) {
-            timeVisitante.setVitorias(1);
-            timeCasa.setDerrotas(1);
+            timeVisitante.setVitorias();
+            timeCasa.setDerrotas();
         };
         if((jogo.getGolsA()) == (jogo.getGolsB())) {
-            timeCasa.setEmpates(1);
-            timeVisitante.setEmpates(1);
+            timeCasa.setEmpates();
+            timeVisitante.setEmpates();
         }
         timeCasa.setGolsPros(jogo.getGolsA());
         timeCasa.setGolsContra(jogo.getGolsB());
         timeVisitante.setGolsPros(jogo.getGolsB());
         timeVisitante.setGolsContra(jogo.getGolsA());
 
-        timeCasa.setJogos(1);
-        timeVisitante.setJogos(1);
+        timeCasa.setJogos();
+        timeVisitante.setJogos();
         timeCasa.setPontos();
         timeVisitante.setPontos();
         timeCasa.setPontosPossiveis();
         timeVisitante.setPontosPossiveis();
         timeCasa.setAproveitamento();
         timeVisitante.setAproveitamento();
+        timeCasa.setSaldoGols();
+        timeVisitante.setSaldoGols();
 
         tabela.setPontos(timeCasa);
         tabela.setPontos(timeVisitante);
-
+        tabela.ordenaTabela();
+        return "Jogo Cadastrado!";
     }
 
 }
